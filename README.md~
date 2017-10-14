@@ -9,6 +9,4 @@ and sensor feedback to grasp at commonly used objects.
   * sends them to the cloud where object recognition is performed, 
   * checks the relative object position and distance, and
   * commands the gripping motion
-* __firmware__ contains the firmware that runs on the Arduino, which receives
-UART signals from the computer, and either sends back distance data from the
-distance sensor or grips the object by a specified amount.
+* __
