@@ -11,79 +11,80 @@ const int TouchPin = 4;
 
 long duration;
 int distance;
-int inByte = 0;
+char inByte = 0;
 
 void setup() {
-  // put your setup code here, to run once:
-myServo.attach(11);
+    // put your setup code here, to run once:
+    myServo.attach(11);
 
-pinMode(trigPin, OUTPUT);
+    pinMode(trigPin, OUTPUT);
 
-pinMode(TouchPin, INPUT);
+    pinMode(TouchPin, INPUT);
 
-//pinMode(grip, OUTPUT);
+    //pinMode(grip, OUTPUT);
 
-pinMode(echoPin, INPUT);
+    pinMode(echoPin, INPUT);
 
-pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 
-Serial.begin(9600);
-//establishContact();
+    Serial.begin(9600);
+    //establishContact();
 }
 
 void loop() {
-  inByte = Serial.read();
-  
-  // put your main code here, to run repeatedly:
-  if (inByte == 100) {
-  
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
+    if (Serial.available()) {
+        inByte = Serial.read();
 
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin,LOW);
+        switch (inByte) {
+            case(100) : { // 100
 
-    duration = pulseIn(echoPin, HIGH);
+                digitalWrite(trigPin, LOW);
+                delayMicroseconds(2);
 
-    distance = duration*0.034/2;
+                digitalWrite(trigPin, HIGH);
+                delayMicroseconds(10);
+                digitalWrite(trigPin,LOW);
 
-    //Serial.print("Distance: ");
-    Serial.println(distance);
- // Serial.write(distance);
-    delay(1000);
+                duration = pulseIn(echoPin, HIGH);
 
-    if (distance < threshold) {
-      digitalWrite(LED_BUILTIN, HIGH);
- //    digitalWrite(grip, HIGH);
-    }  else {
-      digitalWrite(LED_BUILTIN, LOW);
- //   digitalWrite(grip, LOW);l
+                distance = duration*0.034/2;
+
+                //Serial.print("Distance: ");
+                Serial.println(distance);
+                // Serial.write(distance);
+                delay(1000);
+
+                if (distance < threshold) {
+                    digitalWrite(LED_BUILTIN, HIGH);
+                    //    digitalWrite(grip, HIGH);
+                }  else {
+                    digitalWrite(LED_BUILTIN, LOW);
+                    //   digitalWrite(grip, LOW);l
+                }
+                break;
+
+            }
+            case('t') : { // 116
+
+                int sensorValue = digitalRead(TouchPin);
+                //Serial.print("Touch: ");
+                Serial.println(sensorValue);
+                delay(1000);
+                // Serial.write(sensorValue);
+                break;
+            }
+
+            case('g') : { // 103
+                angle = Serial.read();
+                myServo.write(angle);
+                delay(15);
+                break;
+            }
+            case('u') : {// 117
+                myServo.write(0);
+                delay(15);
+                break;
+            }
+        }
+    }
 }
-
-}
-if (inByte == 116) {
- 
- int sensorValue = digitalRead(TouchPin);
-  //Serial.print("Touch: ");
-  Serial.println(sensorValue);
-  delay(1000);
- // Serial.write(sensorValue);
-}
-
-if (inByte == 103) {
-  angle = Serial.read();
-  myServo.write(angle);
-  delay(15);
-}
-if (inByte == 117) {
-  myServo.write(0);
-  delay(15);
-}
-}
-
-//void establishContact() {
-
-  
-//}
-
