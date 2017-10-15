@@ -1,6 +1,9 @@
 import numpy as np
 from math import sqrt, pi
 import cv2
+from gripper_mcu import GripperMCU
+
+import serial
 
 def dist(x1, y1, x2, y2):
     dx = x1 - x2
@@ -19,14 +22,6 @@ def calcActualWidth(pixelWidth, sonarDist, frameWidth=640, fovTh=.8*pi):
     width *= 2*pixelWidth
     width /= frameWidth
     return width
-def sonarRead():
-    return dist
-
-def grip(width):
-    #
-
-def ungrip():
-    #
 
 # The camera device value
 CAMERA_DEV = 1
@@ -35,8 +30,13 @@ CAMERA_DEV = 1
 low_blue = np.uint8([180, 20, 40])
 high_blue = np.uint8([260, 255, 200])
 
+
+
 # Begin new video capture
 cap = cv2.VideoCapture(CAMERA_DEV)
+
+# Instantiate the gripper MCU
+hand = GripperMCU('/dev/ttyACM0')
 
 # Read first frame for information purposes
 ret, frame = cap.read()
@@ -81,10 +81,10 @@ while (True):
         if (frame_center_x >= x) and (frame_center_x <= x+w) \
                 and (frame_center_y >= y) and (frame_center_y <= y+h):
                     # Read distance read by ultrasonic sensor
-                    dSonar = sonarRead()
+                    dSonar = hand.sonarRead()
                     # Check the distance to the sonar
-                    if dSonar <= SONAR_DIST_THRESHOLD:
-                        grip(w); # Grip the object by a certain distance
+                    if dSonar <= hand.SONAR_DIST_THRESHOLD:
+                        hand.grip(w); # Grip the object by a certain distance
 
     
 
@@ -98,4 +98,4 @@ while (True):
 cap.release()
 cv2.destroyAllWindows()
 
-
+ser.close()
